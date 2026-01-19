@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:nxlapp/widgets/custom_elevated_button.dart';
 import 'package:nxlapp/widgets/custom_text_field.dart';
@@ -16,6 +15,62 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+
+  String? fullNameError;
+  String? emailError;
+  String? passwordError;
+  String? confirmPasswordError;
+
+  bool validate() {
+    String fullName = nameController.text.trim();
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+    String confirmPassword = confirmPasswordController.text.trim();
+
+    setState(() {
+      // Full name
+      if (fullName.isEmpty) {
+        fullNameError = "Full name is required";
+      } else {
+        fullNameError = null;
+      }
+
+      // Email
+      if (email.isEmpty) {
+        emailError = "Email is required";
+      } else if (!RegExp(
+        r'^[\w\.\-]+@[\w\-]+\.[a-zA-Z]{2,4}$',
+      ).hasMatch(email)) {
+        emailError = "Invalid email address";
+      } else {
+        emailError = null;
+      }
+
+      // Password
+      if (password.isEmpty) {
+        passwordError = "Password is required";
+      } else if (password.length < 6) {
+        passwordError = "Password must be at least 6 characters";
+      } else {
+        passwordError = null;
+      }
+
+      // Confirm password
+      if (confirmPassword.isEmpty) {
+        confirmPasswordError = "Password is required";
+      } else if (confirmPassword != password) {
+        confirmPasswordError = "Passwords do not match";
+      } else {
+        confirmPasswordError = null;
+      }
+    });
+
+    return fullNameError == null &&
+        emailError == null &&
+        passwordError == null &&
+        confirmPasswordError == null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,25 +91,45 @@ class _SignupScreenState extends State<SignupScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                inputfield(controller: nameController, hintText: "Full Name"),
-                SizedBox(height: 20),
-                inputfield(controller: emailController, hintText: "Email"),
-                SizedBox(height: 20),
+                inputfield(
+                  controller: nameController,
+                  hintText: "Full Name",
+                  errorMessage: fullNameError,
+                ),
+                (fullNameError == null)
+                    ? SizedBox(height: 20)
+                    : SizedBox(height: 5),
+                inputfield(
+                  controller: emailController,
+                  hintText: "Email",
+                  errorMessage: emailError,
+                ),
+                (emailError == null)
+                    ? SizedBox(height: 20)
+                    : SizedBox(height: 5),
                 inputfield(
                   controller: passwordController,
                   hintText: "Password",
+                  errorMessage: passwordError,
                 ),
-                SizedBox(height: 20),
+                (passwordError == null)
+                    ? SizedBox(height: 20)
+                    : SizedBox(height: 5),
                 inputfield(
                   controller: confirmPasswordController,
                   hintText: "Confirm Password",
+                  errorMessage: confirmPasswordError,
                 ),
-                SizedBox(height: 8),
               ],
             ),
           ),
           SizedBox(height: 20),
-          customElevatedButton(label: "Sign Up", onPressed: () {}),
+          customElevatedButton(
+            label: "Sign Up",
+            onPressed: () {
+              if (!validate()) return;
+            },
+          ),
           SizedBox(height: 17),
           GestureDetector(
             onTap: () => Navigator.pop(context),
