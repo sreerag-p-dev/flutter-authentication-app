@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nxlapp/widgets/custom_elevated_button.dart';
 import 'package:nxlapp/widgets/custom_text_field.dart';
@@ -20,6 +21,7 @@ class _SignupScreenState extends State<SignupScreen> {
   String? emailError;
   String? passwordError;
   String? confirmPasswordError;
+  bool isLoading = false;
 
   bool validate() {
     String fullName = nameController.text.trim();
@@ -71,6 +73,33 @@ class _SignupScreenState extends State<SignupScreen> {
         confirmPasswordError == null;
   }
 
+  void signUp() async {
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          )
+          .then((value) {
+            messenger.showSnackBar(
+              SnackBar(content: Text("Successfully registered")),
+            );
+            navigator.pop();
+          });
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text("Failed to register")));
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,6 +132,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: emailController,
                   hintText: "Email",
                   errorMessage: emailError,
+                  keyboardType: TextInputType.emailAddress,
                 ),
                 (emailError == null)
                     ? SizedBox(height: 20)
@@ -124,11 +154,20 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
           SizedBox(height: 20),
-          customElevatedButton(
-            label: "Sign Up",
-            onPressed: () {
-              if (!validate()) return;
-            },
+          Stack(
+            alignment: AlignmentGeometry.center,
+            children: [
+              customElevatedButton(
+                label: "Sign Up",
+                onPressed: () {
+                  if (!validate()) return;
+                  signUp();
+                },
+              ),
+              isLoading
+                  ? CircularProgressIndicator(color: Colors.black)
+                  : SizedBox.shrink(),
+            ],
           ),
           SizedBox(height: 17),
           GestureDetector(

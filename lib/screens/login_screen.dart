@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:nxlapp/screens/home_screen.dart';
@@ -17,6 +18,44 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   String? emailError;
   String? passwordError;
+  bool isLoading = false;
+  bool isVisible = false;
+
+  void login() async {
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          )
+          .then((value) {
+            messenger.showSnackBar(
+              SnackBar(content: Text("Successfully Logged In")),
+            );
+            navigator.pushReplacement(
+              MaterialPageRoute(builder: (_) => HomeScreen()),
+            );
+          });
+    } on FirebaseAuthException catch (e) {
+      debugPrint("------------$e------------");
+      if (e.code == "invalid-credential") {
+        messenger.showSnackBar(SnackBar(content: Text("Invalid credentials")));
+      } else {
+        messenger.showSnackBar(SnackBar(content: Text("Login Failed")));
+      }
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text("Login Failed")));
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   bool validate() {
     String email = emailController.text.trim();
@@ -71,6 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: emailController,
                   hintText: "Email",
                   errorMessage: emailError,
+                  keyboardType: TextInputType.emailAddress
                 ),
                 (emailError == null)
                     ? SizedBox(height: 20)
@@ -79,6 +119,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: passwordController,
                   hintText: "Password",
                   errorMessage: passwordError,
+                  obscureText: !isVisible,
+                  onPressed: () {
+                    setState(() {
+                      isVisible = !isVisible;
+                    });
+                  },
                 ),
                 SizedBox(height: 8),
                 Align(
@@ -98,15 +144,20 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           SizedBox(height: 20),
-          customElevatedButton(
-            label: "Login",
-            onPressed: () {
-              if (!validate()) return;
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => HomeScreen()),
-              );
-            },
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              customElevatedButton(
+                label: "Login",
+                onPressed: () {
+                  if (!validate()) return;
+                  login();
+                },
+              ),
+              isLoading
+                  ? CircularProgressIndicator(color: Colors.black)
+                  : SizedBox.shrink(),
+            ],
           ),
           SizedBox(height: 20),
           Text.rich(

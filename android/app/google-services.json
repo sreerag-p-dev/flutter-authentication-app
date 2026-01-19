@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "582652587994",
+    "project_id": "nxlapp-7fb70",
+    "storage_bucket": "nxlapp-7fb70.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:582652587994:android:69e6f1bc6d8dab9d8fdae3",
+        "android_client_info": {
+          "package_name": "com.example.nxlapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlPvcP7eWjF-zgAbN3qOiESkNwNYNrwgo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,9 +1,41 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nxlapp/screens/login_screen.dart';
 import 'package:nxlapp/widgets/custom_elevated_button.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool isLoading = false;
+
+  void signout() async {
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      await FirebaseAuth.instance.signOut().then((value) {
+        messenger.showSnackBar(
+          SnackBar(content: Text("Successfully Logged out")),
+        );
+        navigator.pushReplacement(
+          MaterialPageRoute(builder: (_) => LoginScreen()),
+        );
+      });
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text("Failed to Log out")));
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +46,7 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Hello Sreerag!",
+              "Hello Buddy!",
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.w700,
@@ -31,14 +63,19 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 30),
-            customElevatedButton(
-              label: "Log Out",
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => LoginScreen()),
-                );
-              },
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                customElevatedButton(
+                  label: "Log Out",
+                  onPressed: () {
+                    signout();
+                  },
+                ),
+                isLoading
+                    ? CircularProgressIndicator(color: Colors.black)
+                    : SizedBox.shrink(),
+              ],
             ),
           ],
         ),

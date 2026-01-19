@@ -4,6 +4,9 @@ Widget inputfield({
   required String hintText,
   required TextEditingController controller,
   String? errorMessage,
+  bool? obscureText,
+  void Function()? onPressed,
+  TextInputType? keyboardType,
 }) {
   return Column(
     children: [
@@ -22,10 +25,21 @@ Widget inputfield({
         ),
         child: TextField(
           controller: controller,
+          keyboardType: keyboardType,
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hintText,
+            suffixIcon: onPressed != null && obscureText != null
+                ? GestureDetector(
+                    onTap: onPressed,
+                    child: obscureText
+                        ? Icon(Icons.visibility)
+                        : Icon(Icons.visibility_off),
+                  )
+                : SizedBox.shrink(),
+            suffixIconConstraints: BoxConstraints(maxHeight: 30),
           ),
+          obscureText: obscureText ?? false,
         ),
       ),
       (errorMessage != null)
