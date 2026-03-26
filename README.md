@@ -1,16 +1,25 @@
-# nxlapp
+# Authentication App
 
-A new Flutter project.
+A simple Flutter application implementing user authentication using Firebase.
+
+## Features
+
+* User sign up and login
+* Firebase authentication
+* Form validation
+  
+
+## Tech Stack
+
+* Flutter
+* Dart
+* Firebase Authentication
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+flutter pub get
+flutter run
 
-A few resources to get you started if this is your first Flutter project:
+## About
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This project demonstrates basic authentication in Flutter using Firebase, including user login and registration with validation.
